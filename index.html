@@ -193,7 +193,7 @@
                     <li><strong>Almacenamiento:</strong> Los videos se guardarán de forma segura en nuestros sistemas durante el proceso de selección</li>
                     <li><strong>Acceso:</strong> Solo el equipo de reclutamiento autorizado tendrá acceso a tus videos</li>
                     <li><strong>Retención:</strong> Los datos serán eliminados 90 días después de finalizado el proceso de selección o antes si lo solicitas</li>
-                    <li><strong>Tus derechos:</strong> Puedes solicitar acceso, corrección o eliminación de tus datos en cualquier momento contactando a [tu-email-de-privacidad@empresa.com]</li>
+                    <li><strong>Tus derechos:</strong> Puedes solicitar acceso, corrección o eliminación de tus datos en cualquier momento contactando a privacidad@corhreselect.com</li>
                 </ul>
                 
                 <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 15px;">
@@ -327,7 +327,7 @@
         const CONFIG = {
             AIRTABLE_API_KEY: 'pat5lEZUTWwxqfUOc.568d6970919313fa1fa0a5a37a2a30127518acafb18ea1529be5c1fa040fcd92',
             AIRTABLE_BASE_ID: 'appvaNZdmHt24cHJV',
-            MAX_RECORDING_SECONDS: 180 // 3 minutos
+            MAX_RECORDING_SECONDS: 180
         };
 
         const TABLES = {
@@ -451,14 +451,13 @@
                     throw new Error('Esta evaluación ya no está activa');
                 }
                 
-                const evaluationId = resultData.fields['1. Evaluaciones']?.[0];
+                const evaluationId = resultData.fields['Evaluación asignada']?.[0];
                 if (!evaluationId) {
                     throw new Error('No se encontró la evaluación asociada');
                 }
                 
                 const evaluationData = await airtableRequest(TABLES.EVALUATIONS, evaluationId);
                 
-                // Obtener preguntas de campos separados
                 const softSkillsIds = evaluationData.fields['Preguntas soft skills'] || [];
                 const englishIds = evaluationData.fields['Preguntas inglés'] || [];
                 
