@@ -458,8 +458,9 @@
                 
                 const evaluationData = await airtableRequest(TABLES.EVALUATIONS, evaluationId);
                 
-                const softSkillsIds = evaluationData.fields['Preguntas Soft Skills'] || [];
-                const englishIds = evaluationData.fields['Preguntas Inglés'] || [];
+                // Obtener preguntas de campos separados
+                const softSkillsIds = evaluationData.fields['Preguntas soft skills'] || [];
+                const englishIds = evaluationData.fields['Preguntas inglés'] || [];
                 
                 if (softSkillsIds.length === 0 && englishIds.length === 0) {
                     throw new Error('No hay preguntas configuradas para esta evaluación');
@@ -472,12 +473,31 @@
                 
                 state.questions = [];
                 
-                softSkillsIds.forEach((id, index) => {
+                // Función para limpiar el texto de la pregunta
+                function cleanQuestionText(text) {
+                    if (!text) return '';
+                    
+                    // Si tiene " – " (guion largo), toma solo la parte ANTES del primer " – "
+                    if (text.includes(' – ')) {
+                        return text.split(' – ')[0].trim();
+                    }
+                    
+                    // Si tiene " - " (guion corto con espacios), igual
+                    if (text.includes(' - ')) {
+                        return text.split(' - ')[0].trim();
+                    }
+                    
+                    // Si no tiene guiones, devuelve el texto original
+                    return text.trim();
+                }
+                
+                // Agregar preguntas de Soft Skills
+                softSkillsIds.forEach((id) => {
                     const questionData = questionsData.find(q => q.id === id);
                     if (questionData && questionData.fields && questionData.fields['Pregunta']) {
                         state.questions.push({
                             id: questionData.id,
-                            text: questionData.fields['Pregunta'],
+                            text: cleanQuestionText(questionData.fields['Pregunta']),
                             type: 'softskills',
                             language: 'es'
                         });
@@ -486,20 +506,23 @@
                 
                 state.softSkillsCount = state.questions.length;
                 
-                englishIds.forEach((id, index) => {
+                // Agregar preguntas de Inglés
+                englishIds.forEach((id) => {
                     const questionData = questionsData.find(q => q.id === id);
                     if (questionData && questionData.fields && questionData.fields['Pregunta']) {
                         state.questions.push({
                             id: questionData.id,
-                            text: questionData.fields['Pregunta'],
+                            text: cleanQuestionText(questionData.fields['Pregunta']),
                             type: 'english',
                             language: 'en'
                         });
                     }
                 });
                 
+                const englishCount = state.questions.length - state.softSkillsCount;
+                
                 document.getElementById('totalQuestions').textContent = 
-                    `${state.questions.length} preguntas (${softSkillsIds.length} Soft Skills + ${englishIds.length} English)`;
+                    `${state.questions.length} preguntas (${state.softSkillsCount} Soft Skills + ${englishCount} English)`;
                 
             } catch (error) {
                 console.error('Error cargando datos:', error);
