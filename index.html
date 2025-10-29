@@ -325,7 +325,8 @@
         // ============================================
         
         const CONFIG = {
-            AIRTABLE_API_KEY: 'pat8HfQycVovWbSqL.155d12d223032afc2f77851c33a7ee6170030411abc573a632637519de0f1bbb',
+            AIRTABLE_API_KEY: 'pat8oZQ31bhFCgtiu.1b614abc17a743d1438108fab30e7d7affc095b7d0f7269d0b03dfa77b502ac6',
+            WEBHOOK_URL: 'https://hooks.airtable.com/workflows/v1/genericWebhook/appvaNZdmHt24cHJV/wfrO5ge0udt78DEi6:1',
             AIRTABLE_BASE_ID: 'appvaNZdmHt24cHJV',
             MAX_RECORDING_SECONDS: 180
         };
@@ -333,8 +334,7 @@
         const TABLES = {
             EVALUATIONS: 'tblaMFH86OlzCp9dj',
             RESULTS: 'tbl3LOdaZaMfAGBxP',
-            QUESTIONS: 'tbl8wHh68rNh4h1Zp',
-            RESPONSES: 'tblILLpEJW4OxJugV'
+            QUESTIONS: 'tbl8wHh68rNh4h1Zp'
         };
 
         let state = {
@@ -730,20 +730,26 @@
                 
                 const base64Data = await base64Promise;
                 
-                const videoField = question.type === 'softskills' ? 
-                    'Video respuesta soft skills' : 
-                    'Video respuesta inglés';
-                
-                const responseData = {
-                    fields: {
-                        '6. Resultados de evaluaciones por candidato 3': [state.evaluationId],
-                        'Pregunta': [question.id],
-                        [videoField]: base64Data,  // DIRECTO, no array
-                        'Número de intentos': 1
-                    }
+                // Preparar datos para el webhook
+                const webhookData = {
+                    evaluationId: state.evaluationId,
+                    questionId: question.id,
+                    videoDataSoft: question.type === 'softskills' ? base64Data : '',
+                    videoDataEnglish: question.type === 'english' ? base64Data : ''
                 };
                 
-                await airtableRequest(TABLES.RESPONSES, '', 'POST', responseData);
+                // Enviar al webhook de Airtable
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(webhookData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Webhook error: ${response.status}`);
+                }
                 
             } catch (error) {
                 console.error('Error guardando video:', error);
@@ -757,20 +763,17 @@
                     state.stream.getTracks().forEach(track => track.stop());
                 }
                 
-                const updateData = {
-                    fields: {
-                        'Activo': false
-                    }
-                };
-                
-                await airtableRequest(TABLES.RESULTS, state.evaluationId, 'PATCH', updateData);
+                // Ya no necesitamos desactivar via API
+                // La automatización puede hacerlo si es necesario
                 
                 document.getElementById('questionContainer').classList.add('hidden');
                 document.getElementById('resultsScreen').classList.remove('hidden');
                 
             } catch (error) {
                 console.error('Error al finalizar evaluación:', error);
-                alert('Error al guardar resultados. Por favor, contacta al administrador.');
+                // Mostrar resultados de todos modos
+                document.getElementById('questionContainer').classList.add('hidden');
+                document.getElementById('resultsScreen').classList.remove('hidden');
             }
         }
 
