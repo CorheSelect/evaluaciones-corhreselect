@@ -326,7 +326,7 @@
         
         const CONFIG = {
             AIRTABLE_API_KEY: 'pat8oZQ31bhFCgtiu.1b614abc17a743d1438108fab30e7d7affc095b7d0f7269d0b03dfa77b502ac6',
-            WEBHOOK_URL: 'https://hooks.airtable.com/workflows/v1/genericWebhook/appvaNZdmHt24cHJV/wfrO5ge0udt78DEi6:1',
+            SAVE_VIDEO_API: 'https://corheselect-evaluaciones-corheselects-projects.vercel.app/api/save-video',
             AIRTABLE_BASE_ID: 'appvaNZdmHt24cHJV',
             MAX_RECORDING_SECONDS: 180
         };
@@ -730,34 +730,28 @@
                 
                 const base64Data = await base64Promise;
                 
-                const videoField = question.type === 'softskills' ? 
-                    'Video respuesta soft skills' : 
-                    'Video respuesta inglés';
-                
-                // Guardar directamente en Airtable via API
-                const responseData = {
-                    fields: {
-                        [videoField]: base64Data,
-                        'Número de intentos': 1
-                    }
-                };
-                
-                // Usar API directamente - SIN campos de link
-                const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/tblILLpEJW4OxJugV`;
-                const response = await fetch(url, {
+                // Enviar a nuestra API de Vercel (evita CORS y problemas de permisos)
+                const response = await fetch(CONFIG.SAVE_VIDEO_API, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${CONFIG.AIRTABLE_API_KEY}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(responseData)
+                    body: JSON.stringify({
+                        evaluationId: state.evaluationId,
+                        questionId: question.id,
+                        videoData: base64Data,
+                        videoType: question.type
+                    })
                 });
                 
                 if (!response.ok) {
                     const error = await response.json();
-                    console.error('Error de Airtable:', error);
-                    throw new Error(`Error ${response.status}: ${JSON.stringify(error)}`);
+                    console.error('Error al guardar video:', error);
+                    throw new Error(`Error ${response.status}: ${error.error || 'Unknown error'}`);
                 }
+                
+                const result = await response.json();
+                console.log('Video guardado exitosamente:', result.recordId);
                 
             } catch (error) {
                 console.error('Error guardando video:', error);
