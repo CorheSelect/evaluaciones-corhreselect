@@ -730,25 +730,33 @@
                 
                 const base64Data = await base64Promise;
                 
-                // Preparar datos para el webhook
-                const webhookData = {
-                    evaluationId: state.evaluationId,
-                    questionId: question.id,
-                    videoDataSoft: question.type === 'softskills' ? base64Data : '',
-                    videoDataEnglish: question.type === 'english' ? base64Data : ''
+                const videoField = question.type === 'softskills' ? 
+                    'Video respuesta soft skills' : 
+                    'Video respuesta inglés';
+                
+                // Guardar directamente en Airtable via API
+                const responseData = {
+                    fields: {
+                        [videoField]: base64Data,
+                        'Número de intentos': 1
+                    }
                 };
                 
-                // Enviar al webhook de Airtable
-                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                // Usar API directamente - SIN campos de link
+                const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/tblILLpEJW4OxJugV`;
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer ${CONFIG.AIRTABLE_API_KEY}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(webhookData)
+                    body: JSON.stringify(responseData)
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Webhook error: ${response.status}`);
+                    const error = await response.json();
+                    console.error('Error de Airtable:', error);
+                    throw new Error(`Error ${response.status}: ${JSON.stringify(error)}`);
                 }
                 
             } catch (error) {
