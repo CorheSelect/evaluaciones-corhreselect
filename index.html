@@ -405,10 +405,13 @@
             try {
                 state.stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
                     }, 
-                    audio: true 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
                 });
                 
                 document.getElementById('videoPreview').srcObject = state.stream;
@@ -735,11 +738,7 @@
                     fields: {
                         '6. Resultados de evaluaciones por candidato 3': [state.evaluationId],
                         'Pregunta': [question.id],
-                        [videoField]: [
-                            {
-                                url: base64Data
-                            }
-                        ],
+                        [videoField]: base64Data,  // DIRECTO, no array
                         'Número de intentos': 1
                     }
                 };
