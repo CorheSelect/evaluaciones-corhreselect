@@ -48,7 +48,7 @@
         .transition-tips li { margin: 8px 0; color: #4a5568; }
         
         /* Question Screen */
-        #questionContainer { padding: 40px; }
+        #questionContainer { padding: 40px; position: relative; }
         .progress-container { background: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; margin-bottom: 30px; }
         .progress-bar { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
         .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -93,6 +93,27 @@
         .btn-disabled { background: #cbd5e0; cursor: not-allowed; }
         
         .timer-display { text-align: center; font-size: 24px; font-weight: 600; color: #2d3748; margin: 15px 0; }
+        
+        /* Loading Overlay - NUEVO */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 10px;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-content {
+            text-align: center;
+        }
         
         /* Loading */
         #loadingScreen { padding: 60px 40px; text-align: center; }
@@ -152,62 +173,46 @@
                 </div>
                 <div class="info-item">
                     <div class="info-icon">📝</div>
-                    <div class="info-label">Total de preguntas</div>
+                    <div class="info-label">Preguntas totales</div>
                     <div class="info-value" id="totalQuestions">-</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-icon">👤</div>
-                    <div class="info-label">Evaluación</div>
-                    <div class="info-value">Manual por headhunter</div>
+                    <div class="info-icon">🕐</div>
+                    <div class="info-label">Duración estimada</div>
+                    <div class="info-value" id="estimatedTime">-</div>
                 </div>
-            </div>
-
-            <div class="camera-check">
-                <h3>⚠️ Requisitos técnicos:</h3>
-                <ul style="margin-left: 25px; padding-left: 0;">
-                    <li style="margin: 10px 0;">Debes permitir el acceso a tu cámara y micrófono</li>
-                    <li style="margin: 10px 0;">Asegúrate de tener buena iluminación</li>
-                    <li style="margin: 10px 0;">Busca un lugar tranquilo sin ruido de fondo</li>
-                    <li style="margin: 10px 0;">Verifica que tu conexión a internet sea estable</li>
-                </ul>
             </div>
 
             <div class="instructions">
-                <h3>📋 Cómo funciona:</h3>
+                <h3>📋 Instrucciones Importantes</h3>
                 <ul>
-                    <li><strong>Lee la pregunta:</strong> Tómate el tiempo que necesites para leerla y preparar tu respuesta</li>
-                    <li><strong>Cuando estés listo/a:</strong> Haz clic en "Estoy listo para grabar"</li>
-                    <li><strong>Graba tu respuesta:</strong> Máximo 2-3 minutos por pregunta</li>
-                    <li><strong>Revisa:</strong> Puedes ver tu video antes de continuar</li>
-                    <li><strong>Re-grabar:</strong> Si no estás satisfecho/a, puedes grabar de nuevo</li>
-                    <li><strong>Secciones:</strong> Primero preguntas en español, luego en inglés</li>
+                    <li><strong>Tiempo de preparación:</strong> Tendrás 60 segundos para leer y preparar tu respuesta antes de grabar</li>
+                    <li><strong>Tiempo de grabación:</strong> Máximo 3 minutos por pregunta</li>
+                    <li><strong>Revisión:</strong> Podrás revisar y regrabar cada respuesta antes de continuar</li>
+                    <li><strong>Ambiente:</strong> Busca un lugar tranquilo con buena iluminación</li>
+                    <li><strong>Dispositivo:</strong> Asegúrate de tener cámara y micrófono funcionando</li>
                 </ul>
             </div>
 
-            <div class="instructions" style="border-left: 4px solid #667eea;">
-                <h3>🔒 Aviso de Privacidad y Consentimiento</h3>
-                <p style="margin-bottom: 12px;">Al continuar con esta evaluación:</p>
-                <ul style="font-size: 14px; line-height: 1.6;">
-                    <li><strong>Recopilación de datos:</strong> Se grabarán videos de tus respuestas junto con tu información personal (nombre, email)</li>
-                    <li><strong>Uso de datos:</strong> Los videos serán utilizados exclusivamente para evaluar tu candidatura en el proceso de selección</li>
-                    <li><strong>Almacenamiento:</strong> Los videos se guardarán de forma segura en nuestros sistemas durante el proceso de selección</li>
-                    <li><strong>Acceso:</strong> Solo el equipo de reclutamiento autorizado tendrá acceso a tus videos</li>
-                    <li><strong>Retención:</strong> Los datos serán eliminados 90 días después de finalizado el proceso de selección o antes si lo solicitas</li>
-                    <li><strong>Tus derechos:</strong> Puedes solicitar acceso, corrección o eliminación de tus datos en cualquier momento contactando a privacidad@corhreselect.com</li>
-                </ul>
-                
-                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                    <label style="display: flex; align-items: start; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="privacyConsent" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;">
-                        <span style="font-size: 14px; color: #2d3748;">
-                            <strong>He leído y acepto el aviso de privacidad.</strong> Autorizo la grabación de videos y el tratamiento de mis datos personales para fines del proceso de selección.
-                        </span>
-                    </label>
-                </div>
+            <div class="camera-check">
+                <h3>⚠️ Verificación Técnica</h3>
+                <p>Antes de comenzar, esta aplicación solicitará acceso a tu cámara y micrófono. Por favor, <strong>acepta los permisos</strong> cuando se soliciten.</p>
             </div>
 
-            <button class="start-button" id="startButton" onclick="validateAndStart()" disabled style="opacity: 0.5; cursor: not-allowed;">
-                Comenzar Evaluación
+            <div style="background: #e6f4ff; padding: 20px; border-radius: 8px; border-left: 4px solid #1890ff; margin: 20px 0;">
+                <h3 style="color: #0050b3; margin-bottom: 10px;">🔒 Privacidad y Uso de Datos</h3>
+                <p style="color: #003a8c; line-height: 1.6; margin-bottom: 15px;">
+                    Tus respuestas en video serán utilizadas exclusivamente para el proceso de selección de CoRheSelect. 
+                    Los datos serán almacenados de forma segura y solo serán accesibles por el equipo de reclutamiento autorizado.
+                </p>
+                <label style="display: flex; align-items: center; cursor: pointer; color: #003a8c; font-weight: 500;">
+                    <input type="checkbox" id="privacyConsent" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                    He leído y acepto el uso de mis datos personales para el proceso de selección
+                </label>
+            </div>
+
+            <button id="startButton" class="start-button" onclick="startEvaluation()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                🚀 Comenzar Evaluación
             </button>
         </div>
 
@@ -216,79 +221,88 @@
             <div class="transition-icon">🌍</div>
             <h2 class="transition-title">English Assessment</h2>
             <p class="transition-message">
-                Great job! You've completed the Soft Skills section.<br>
-                Now we'll continue with the English assessment.
+                Great job on the first section! Now we'll continue with the English assessment. 
+                You'll answer questions in English to evaluate your language proficiency.
             </p>
             
             <div class="transition-tips">
-                <h4>💡 Tips for the English section:</h4>
+                <h4>💡 Tips for the English Section:</h4>
                 <ul>
-                    <li><strong>Speak naturally:</strong> Don't worry about being perfect</li>
-                    <li><strong>Take your time:</strong> Read the question and prepare before recording</li>
-                    <li><strong>Be yourself:</strong> We want to hear your authentic voice</li>
-                    <li><strong>Relax:</strong> You're doing great!</li>
+                    <li><strong>Speak naturally:</strong> Don't worry about perfection, focus on clear communication</li>
+                    <li><strong>Take your time:</strong> Use the preparation time to organize your thoughts</li>
+                    <li><strong>Be yourself:</strong> We want to see your authentic communication style</li>
                 </ul>
             </div>
-            
-            <button class="start-button btn-continue" onclick="continueToEnglishSection()">Continue to English Section →</button>
+
+            <button class="start-button btn-continue" onclick="continueToNextSection()">
+                Continue to English Section →
+            </button>
         </div>
 
-        <!-- QUESTION SCREEN -->
+        <!-- QUESTION CONTAINER -->
         <div id="questionContainer" class="hidden">
+            <!-- Loading Overlay - NUEVO -->
+            <div id="loadingOverlay" class="loading-overlay">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <p id="loadingOverlayText">Guardando video...</p>
+                </div>
+            </div>
+            
             <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
+                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
             </div>
             
             <div class="question-header">
-                <span class="question-number" id="questionNumber">Pregunta 1 de X</span>
-                <span class="language-badge" id="languageBadge">🇪🇸 ESPAÑOL</span>
+                <span id="questionNumber" class="question-number"></span>
+                <span id="languageBadge" class="language-badge"></span>
             </div>
             
-            <div class="question-text" id="questionText"></div>
+            <div id="questionText" class="question-text"></div>
             
-            <!-- Preparation Phase -->
-            <div id="prepPhase" class="prep-phase">
-                <h3>📖 <span id="prepTitle">Tómate tu tiempo para preparar</span></h3>
-                <p id="prepMessage">Lee la pregunta con atención y prepara mentalmente tu respuesta. Cuando estés listo/a para grabar, haz clic en el botón de abajo.</p>
-                
-                <div class="prep-tips">
-                    <strong>💡 Consejos:</strong>
-                    <ul>
-                        <li>Piensa en ejemplos concretos de tu experiencia</li>
-                        <li>Estructura tu respuesta: contexto → acción → resultado</li>
-                        <li>Habla con naturalidad, como en una conversación</li>
-                        <li>No hay prisa, tómate el tiempo que necesites</li>
-                    </ul>
+            <!-- PREPARATION PHASE -->
+            <div id="prepPhase">
+                <div class="prep-phase">
+                    <h3 id="prepTitle">⏱️ Tiempo de Preparación</h3>
+                    <p id="prepMessage">Lee la pregunta cuidadosamente y prepara tu respuesta. Cuando estés listo/a, presiona el botón para comenzar a grabar.</p>
+                    
+                    <div class="prep-tips">
+                        <strong>💡 Consejos:</strong>
+                        <ul>
+                            <li>Piensa en ejemplos concretos de tu experiencia</li>
+                            <li>Estructura tu respuesta: situación → acción → resultado</li>
+                            <li>Sé auténtico/a y específico/a</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timer-display" id="prepTimer">01:00</div>
+                    
+                    <div class="controls">
+                        <button class="control-button btn-ready" onclick="startRecording()" id="readyButton">
+                            🎥 <span id="readyButtonText">Estoy Listo/a - Comenzar Grabación</span>
+                        </button>
+                    </div>
                 </div>
-                
-                <button class="start-button btn-ready" onclick="showRecordingPhase()">
-                    ✅ <span id="btnReadyText">Estoy listo/a para grabar</span>
-                </button>
             </div>
-            
-            <!-- Recording Phase -->
+
+            <!-- RECORDING PHASE -->
             <div id="recordingPhase" class="hidden">
                 <div class="video-container">
                     <video id="videoPreview" autoplay muted playsinline></video>
-                    <div class="recording-status" id="recordingStatus">
+                    <div id="recordingStatus" class="recording-status">
                         <div class="recording-dot"></div>
-                        <span id="recordingText">GRABANDO</span>
+                        <span id="recordingTimer">00:00</span>
                     </div>
                 </div>
                 
-                <div class="timer-display" id="recordingTimer">00:00</div>
-                
-                <div class="controls" id="recordingControls">
-                    <button class="control-button btn-record" id="btnStartRecord" onclick="startRecording()">
-                        🎥 <span id="btnRecordText">Comenzar Grabación</span>
-                    </button>
-                    <button class="control-button btn-stop hidden" id="btnStopRecord" onclick="stopRecording()">
-                        ⏹️ <span id="btnStopText">Detener Grabación</span>
+                <div class="controls">
+                    <button class="control-button btn-stop" onclick="stopRecording()" id="stopButton">
+                        ⏹️ <span id="stopButtonText">Detener Grabación</span>
                     </button>
                 </div>
             </div>
-            
-            <!-- Review Phase -->
+
+            <!-- REVIEW PHASE -->
             <div id="reviewPhase" class="hidden">
                 <div class="video-container">
                     <video id="videoPlayback" controls playsinline></video>
@@ -296,10 +310,10 @@
                 
                 <div class="controls">
                     <button class="control-button btn-retry" onclick="retryRecording()">
-                        🔄 <span id="btnRetryText">Grabar de nuevo</span>
+                        🔄 <span id="retryButtonText">Grabar de Nuevo</span>
                     </button>
                     <button class="control-button btn-next" onclick="confirmAndNext()">
-                        ✓ <span id="btnNextText">Confirmar y Continuar</span>
+                        ✅ <span id="nextButtonText">Confirmar y Continuar</span>
                     </button>
                 </div>
             </div>
@@ -307,120 +321,70 @@
 
         <!-- RESULTS SCREEN -->
         <div id="resultsScreen" class="hidden">
-            <div class="success-icon">✅</div>
+            <div class="success-icon">🎉</div>
             <h2 class="results-title">¡Evaluación Completada!</h2>
             <p class="results-message">
-                Gracias por completar la evaluación de competencias. Hemos recibido todas tus respuestas en video exitosamente.
-                <br><br>
-                <strong>Thank you for completing the assessment!</strong> We have received all your video responses.
-                <br><br>
-                Nuestro equipo de selección revisará tus respuestas y nos pondremos en contacto contigo pronto con los resultados del proceso.
+                Gracias por completar tu evaluación de competencias. Tus respuestas han sido guardadas exitosamente 
+                y serán revisadas por nuestro equipo de selección.<br><br>
+                Te contactaremos pronto con los próximos pasos del proceso.<br><br>
+                <strong>¡Mucha suerte! 🍀</strong>
             </p>
         </div>
     </div>
 
     <script>
         // ============================================
-        // CONFIGURACIÓN
+        // CONFIGURATION
         // ============================================
         
         const CONFIG = {
-            AIRTABLE_API_KEY: 'pat8oZQ31bhFCgtiu.1b614abc17a743d1438108fab30e7d7affc095b7d0f7269d0b03dfa77b502ac6',
-            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyI5ZK17xa-YHJzPJ9mC0EGnIXLSlAgzqtXEml_MTP-8JxfG0Iw7d1cJE0TtsyDSb9k2Q/exec',
             AIRTABLE_BASE_ID: 'appvaNZdmHt24cHJV',
-            MAX_RECORDING_SECONDS: 180
-        };
-
-        const TABLES = {
-            EVALUATIONS: 'tblaMFH86OlzCp9dj',
-            RESULTS: 'tbl3LOdaZaMfAGBxP',
-            QUESTIONS: 'tbl8wHh68rNh4h1Zp'
-        };
-
-        let state = {
-            evaluationId: null,
-            candidateEmail: null,
-            currentQuestionIndex: 0,
-            questions: [],
-            softSkillsCount: 0,
-            mediaRecorder: null,
-            recordedChunks: [],
-            stream: null,
-            currentBlob: null,
-            currentSection: 'softskills'
+            AIRTABLE_TOKEN: 'pat8oZQ31bhFCgtiu.1b614abc17a743d1438108fab30e7d7affc095b7d0f7269d0b03dfa77b502ac6',
+            EVALUATIONS_TABLE: 'tblaMFH86OlzCp9dj',
+            QUESTIONS_TABLE: 'tbl8wHh68rNh4h1Zp',
+            PREP_TIME_SECONDS: 60,
+            MAX_RECORDING_SECONDS: 180,
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyI5ZK17xa-YHJzPJ9mC0EGnIXLSlAgzqtXEml_MTP-8JxfG0Iw7d1cJE0TtsyDSb9k2Q/exec'
         };
 
         // ============================================
-        // UTILITY FUNCTIONS
+        // STATE MANAGEMENT
         // ============================================
         
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+        const state = {
+            evaluationId: null,
+            evaluation: null,
+            questions: [],
+            currentQuestionIndex: 0,
+            currentSection: 'softskills',
+            stream: null,
+            mediaRecorder: null,
+            recordedChunks: [],
+            currentBlob: null,
+            prepTimer: null,
+            recordingInterval: null
+        };
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        async function airtableRequest(tableId, recordId = '', method = 'GET', data = null) {
-            const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${tableId}${recordId ? '/' + recordId : ''}`;
+        // ============================================
+        // AIRTABLE API
+        // ============================================
+        
+        async function fetchFromAirtable(tableId, recordId = null) {
+            const url = recordId 
+                ? `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${tableId}/${recordId}`
+                : `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${tableId}`;
             
-            const options = {
-                method: method,
+            const response = await fetch(url, {
                 headers: {
-                    'Authorization': `Bearer ${CONFIG.AIRTABLE_API_KEY}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`
                 }
-            };
+            });
             
-            if (data && (method === 'POST' || method === 'PATCH')) {
-                options.body = JSON.stringify(data);
-            }
-            
-            const response = await fetch(url, options);
             if (!response.ok) {
-                throw new Error(`Airtable error: ${response.status}`);
+                throw new Error(`Airtable API error: ${response.status}`);
             }
             
             return await response.json();
-        }
-
-        // ============================================
-        // CAMERA FUNCTIONS
-        // ============================================
-        
-        function validateAndStart() {
-            const consent = document.getElementById('privacyConsent');
-            if (!consent.checked) {
-                alert('Por favor, lee y acepta el aviso de privacidad para continuar.');
-                return;
-            }
-            requestCameraAccess();
-        }
-        
-        async function requestCameraAccess() {
-            try {
-                state.stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    }, 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true
-                    }
-                });
-                
-                document.getElementById('videoPreview').srcObject = state.stream;
-                startEvaluation();
-                
-            } catch (error) {
-                alert('No se pudo acceder a la cámara. Por favor, verifica los permisos y vuelve a intentar.');
-                console.error('Error accediendo a cámara:', error);
-            }
         }
 
         // ============================================
@@ -429,174 +393,108 @@
         
         async function init() {
             try {
-                state.evaluationId = getUrlParameter('id');
+                const urlParams = new URLSearchParams(window.location.search);
+                state.evaluationId = urlParams.get('id');
                 
                 if (!state.evaluationId) {
-                    throw new Error('ID de evaluación no proporcionado');
+                    showError('No se proporcionó un ID de evaluación válido.');
+                    return;
                 }
                 
-                await loadEvaluationData();
+                state.evaluation = await fetchFromAirtable(CONFIG.EVALUATIONS_TABLE, state.evaluationId);
+                
+                if (!state.evaluation.fields['Questions IDs'] || state.evaluation.fields['Questions IDs'].length === 0) {
+                    showError('Esta evaluación no tiene preguntas asignadas.');
+                    return;
+                }
+                
+                const questionIds = state.evaluation.fields['Questions IDs'];
+                const questionsData = await fetchFromAirtable(CONFIG.QUESTIONS_TABLE);
+                
+                state.questions = questionsData.records
+                    .filter(q => questionIds.includes(q.id))
+                    .sort((a, b) => questionIds.indexOf(a.id) - questionIds.indexOf(b.id));
+                
+                if (state.questions.length === 0) {
+                    showError('No se pudieron cargar las preguntas.');
+                    return;
+                }
+                
+                document.getElementById('totalQuestions').textContent = state.questions.length;
+                const estimatedMinutes = Math.ceil(state.questions.length * 4);
+                document.getElementById('estimatedTime').textContent = `${estimatedMinutes} minutos`;
                 
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('welcomeScreen').classList.remove('hidden');
                 
             } catch (error) {
-                alert('Error cargando la evaluación. Verifica el enlace e intenta de nuevo.');
-                console.error('Error en init:', error);
+                console.error('Error initializing:', error);
+                showError('Error al cargar la evaluación. Por favor, verifica el enlace.');
             }
         }
 
-        async function loadEvaluationData() {
-            try {
-                const resultData = await airtableRequest(TABLES.RESULTS, state.evaluationId);
-                
-                if (!resultData.fields['Activo']) {
-                    throw new Error('Esta evaluación ya no está activa');
-                }
-                
-                const evaluationId = resultData.fields['Evaluación asignada']?.[0];
-                if (!evaluationId) {
-                    throw new Error('No se encontró la evaluación asociada');
-                }
-                
-                const evaluationData = await airtableRequest(TABLES.EVALUATIONS, evaluationId);
-                
-                const softSkillsIds = evaluationData.fields['Preguntas soft skills'] || [];
-                const englishIds = evaluationData.fields['Preguntas inglés'] || [];
-                
-                if (softSkillsIds.length === 0 && englishIds.length === 0) {
-                    throw new Error('No hay preguntas configuradas para esta evaluación');
-                }
-                
-                const allQuestionIds = [...softSkillsIds, ...englishIds];
-                const questionsData = await Promise.all(
-                    allQuestionIds.map(id => airtableRequest(TABLES.QUESTIONS, id))
-                );
-                
-                state.questions = [];
-                
-                // Función para limpiar el texto de la pregunta
-                function cleanQuestionText(text) {
-                    if (!text) return '';
-                    
-                    // Si tiene " – " (guion largo), toma solo la parte ANTES del primer " – "
-                    if (text.includes(' – ')) {
-                        return text.split(' – ')[0].trim();
-                    }
-                    
-                    // Si tiene " - " (guion corto con espacios), igual
-                    if (text.includes(' - ')) {
-                        return text.split(' - ')[0].trim();
-                    }
-                    
-                    // Si no tiene guiones, devuelve el texto original
-                    return text.trim();
-                }
-                
-                // Agregar preguntas de Soft Skills
-                softSkillsIds.forEach((id) => {
-                    const questionData = questionsData.find(q => q.id === id);
-                    if (questionData && questionData.fields && questionData.fields['Pregunta']) {
-                        state.questions.push({
-                            id: questionData.id,
-                            text: cleanQuestionText(questionData.fields['Pregunta']),
-                            type: 'softskills',
-                            language: 'es'
-                        });
-                    }
-                });
-                
-                state.softSkillsCount = state.questions.length;
-                
-                // Agregar preguntas de Inglés
-                englishIds.forEach((id) => {
-                    const questionData = questionsData.find(q => q.id === id);
-                    if (questionData && questionData.fields && questionData.fields['Pregunta']) {
-                        state.questions.push({
-                            id: questionData.id,
-                            text: cleanQuestionText(questionData.fields['Pregunta']),
-                            type: 'english',
-                            language: 'en'
-                        });
-                    }
-                });
-                
-                const englishCount = state.questions.length - state.softSkillsCount;
-                
-                document.getElementById('totalQuestions').textContent = 
-                    `${state.questions.length} preguntas (${state.softSkillsCount} Soft Skills + ${englishCount} English)`;
-                
-            } catch (error) {
-                console.error('Error cargando datos:', error);
-                throw error;
-            }
+        function showError(message) {
+            document.getElementById('loadingScreen').innerHTML = `
+                <div style="color: #dc2626; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                    <h2 style="margin-bottom: 10px;">Error</h2>
+                    <p>${message}</p>
+                </div>
+            `;
         }
 
         // ============================================
         // EVALUATION FLOW
         // ============================================
         
-        function startEvaluation() {
-            state.currentQuestionIndex = 0;
-            state.currentSection = 'softskills';
-            
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('questionContainer').classList.remove('hidden');
-            
-            showQuestion();
+        async function startEvaluation() {
+            try {
+                state.stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('questionContainer').classList.remove('hidden');
+                
+                showQuestion();
+                
+            } catch (error) {
+                alert('No se pudo acceder a la cámara y micrófono. Por favor, verifica los permisos.');
+                console.error('Media access error:', error);
+            }
         }
 
         function showQuestion() {
             const question = state.questions[state.currentQuestionIndex];
+            const isEnglish = question.fields['Type'] === 'english';
             
-            if (state.currentQuestionIndex === state.softSkillsCount && state.currentSection === 'softskills') {
+            if (state.currentSection === 'softskills' && isEnglish) {
+                state.currentSection = 'english';
                 showSectionTransition();
                 return;
             }
             
             const progress = ((state.currentQuestionIndex + 1) / state.questions.length) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressBar').style.width = `${progress}%`;
             
-            let questionNumberText = '';
-            let languageBadgeHTML = '';
+            document.getElementById('questionNumber').textContent = 
+                `Pregunta ${state.currentQuestionIndex + 1} de ${state.questions.length}`;
             
-            if (question.type === 'softskills') {
-                const softSkillsNum = state.currentQuestionIndex + 1;
-                questionNumberText = `Pregunta ${softSkillsNum} de ${state.softSkillsCount}`;
-                languageBadgeHTML = '<span class="language-badge">🇪🇸 ESPAÑOL</span>';
-                
-                document.getElementById('prepTitle').textContent = 'Tómate tu tiempo para preparar';
-                document.getElementById('prepMessage').textContent = 'Lee la pregunta con atención y prepara mentalmente tu respuesta. Cuando estés listo/a para grabar, haz clic en el botón de abajo.';
-                document.getElementById('btnReadyText').textContent = 'Estoy listo/a para grabar';
-                document.getElementById('btnRecordText').textContent = 'Comenzar Grabación';
-                document.getElementById('btnStopText').textContent = 'Detener Grabación';
-                document.getElementById('btnRetryText').textContent = 'Grabar de nuevo';
-                document.getElementById('btnNextText').textContent = 'Confirmar y Continuar';
-                document.getElementById('recordingText').textContent = 'GRABANDO';
+            const badge = document.getElementById('languageBadge');
+            if (isEnglish) {
+                badge.textContent = 'English';
+                badge.className = 'language-badge english';
             } else {
-                const englishNum = state.currentQuestionIndex - state.softSkillsCount + 1;
-                const englishTotal = state.questions.length - state.softSkillsCount;
-                questionNumberText = `Question ${englishNum} of ${englishTotal}`;
-                languageBadgeHTML = '<span class="language-badge english">🇬🇧 ENGLISH</span>';
-                
-                document.getElementById('prepTitle').textContent = 'Take your time to prepare';
-                document.getElementById('prepMessage').textContent = 'Read the question carefully and prepare your answer mentally. When you\'re ready to record, click the button below.';
-                document.getElementById('btnReadyText').textContent = 'I\'m ready to record';
-                document.getElementById('btnRecordText').textContent = 'Start Recording';
-                document.getElementById('btnStopText').textContent = 'Stop Recording';
-                document.getElementById('btnRetryText').textContent = 'Record again';
-                document.getElementById('btnNextText').textContent = 'Confirm and Continue';
-                document.getElementById('recordingText').textContent = 'RECORDING';
+                badge.textContent = 'Español';
+                badge.className = 'language-badge';
             }
             
-            document.getElementById('questionNumber').textContent = questionNumberText;
-            document.getElementById('languageBadge').outerHTML = languageBadgeHTML;
+            document.getElementById('questionText').textContent = question.fields['Question text'];
             
-            document.getElementById('questionText').textContent = question.text;
+            updateLanguageTexts(isEnglish);
             
-            document.getElementById('prepPhase').classList.remove('hidden');
-            document.getElementById('recordingPhase').classList.add('hidden');
-            document.getElementById('reviewPhase').classList.add('hidden');
+            showPrepPhase();
         }
 
         function showSectionTransition() {
@@ -604,40 +502,90 @@
             document.getElementById('sectionTransition').classList.remove('hidden');
         }
 
-        function continueToEnglishSection() {
-            state.currentSection = 'english';
+        function continueToNextSection() {
             document.getElementById('sectionTransition').classList.add('hidden');
             document.getElementById('questionContainer').classList.remove('hidden');
             showQuestion();
         }
 
-        function showRecordingPhase() {
-            document.getElementById('prepPhase').classList.add('hidden');
-            document.getElementById('recordingPhase').classList.remove('hidden');
-            
-            document.getElementById('videoPreview').srcObject = state.stream;
-            document.getElementById('btnStartRecord').classList.remove('hidden');
-            document.getElementById('btnStopRecord').classList.add('hidden');
-            document.getElementById('recordingStatus').classList.remove('active');
+        function updateLanguageTexts(isEnglish) {
+            if (isEnglish) {
+                document.getElementById('prepTitle').textContent = '⏱️ Preparation Time';
+                document.getElementById('prepMessage').textContent = 'Read the question carefully and prepare your answer. When ready, press the button to start recording.';
+                document.getElementById('readyButtonText').textContent = "I'm Ready - Start Recording";
+                document.getElementById('stopButtonText').textContent = 'Stop Recording';
+                document.getElementById('retryButtonText').textContent = 'Record Again';
+                document.getElementById('nextButtonText').textContent = 'Confirm and Continue';
+            } else {
+                document.getElementById('prepTitle').textContent = '⏱️ Tiempo de Preparación';
+                document.getElementById('prepMessage').textContent = 'Lee la pregunta cuidadosamente y prepara tu respuesta. Cuando estés listo/a, presiona el botón para comenzar a grabar.';
+                document.getElementById('readyButtonText').textContent = 'Estoy Listo/a - Comenzar Grabación';
+                document.getElementById('stopButtonText').textContent = 'Detener Grabación';
+                document.getElementById('retryButtonText').textContent = 'Grabar de Nuevo';
+                document.getElementById('nextButtonText').textContent = 'Confirmar y Continuar';
+            }
         }
 
         // ============================================
-        // VIDEO RECORDING
+        // RECORDING PHASES
         // ============================================
         
-        function startRecording() {
-            state.recordedChunks = [];
+        function showPrepPhase() {
+            document.getElementById('prepPhase').classList.remove('hidden');
+            document.getElementById('recordingPhase').classList.add('hidden');
+            document.getElementById('reviewPhase').classList.add('hidden');
             
-            const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+            startPrepTimer();
+        }
+
+        function startPrepTimer() {
+            let timeLeft = CONFIG.PREP_TIME_SECONDS;
+            document.getElementById('prepTimer').textContent = formatTime(timeLeft);
             
-            try {
-                state.mediaRecorder = new MediaRecorder(state.stream, options);
-            } catch (e) {
-                state.mediaRecorder = new MediaRecorder(state.stream);
+            if (state.prepTimer) {
+                clearInterval(state.prepTimer);
             }
             
+            state.prepTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('prepTimer').textContent = formatTime(timeLeft);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(state.prepTimer);
+                }
+            }, 1000);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function showRecordingPhase() {
+            if (state.prepTimer) {
+                clearInterval(state.prepTimer);
+            }
+            
+            document.getElementById('prepPhase').classList.add('hidden');
+            document.getElementById('recordingPhase').classList.remove('hidden');
+            document.getElementById('reviewPhase').classList.add('hidden');
+            
+            const videoPreview = document.getElementById('videoPreview');
+            videoPreview.srcObject = state.stream;
+        }
+
+        function startRecording() {
+            showRecordingPhase();
+            
+            state.recordedChunks = [];
+            
+            state.mediaRecorder = new MediaRecorder(state.stream, {
+                mimeType: 'video/webm;codecs=vp8,opus'
+            });
+            
             state.mediaRecorder.ondataavailable = (event) => {
-                if (event.data && event.data.size > 0) {
+                if (event.data.size > 0) {
                     state.recordedChunks.push(event.data);
                 }
             };
@@ -648,9 +596,6 @@
             };
             
             state.mediaRecorder.start();
-            
-            document.getElementById('btnStartRecord').classList.add('hidden');
-            document.getElementById('btnStopRecord').classList.remove('hidden');
             document.getElementById('recordingStatus').classList.add('active');
             
             startRecordingTimer();
@@ -696,27 +641,33 @@
 
         async function confirmAndNext() {
             try {
+                // Mostrar overlay de loading SIN destruir el DOM
                 const loadingText = state.currentSection === 'english' ? 'Saving video...' : 'Guardando video...';
-                document.getElementById('questionContainer').innerHTML = `<div style="text-align: center; padding: 40px;"><div class="spinner"></div><p>${loadingText}</p></div>`;
+                document.getElementById('loadingOverlayText').textContent = loadingText;
+                document.getElementById('loadingOverlay').classList.add('active');
                 
                 await saveVideoResponse();
+                
+                // Ocultar overlay
+                document.getElementById('loadingOverlay').classList.remove('active');
                 
                 state.currentQuestionIndex++;
                 
                 if (state.currentQuestionIndex < state.questions.length) {
-                    showQuestion(); // Mostrar siguiente pregunta sin recargar
+                    showQuestion(); // Ahora funciona porque no destruimos el DOM
                 } else {
                     finishEvaluation();
                 }
                 
             } catch (error) {
+                // Ocultar overlay en caso de error
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
                 const errorText = state.currentSection === 'english' ? 
                     'Error saving video. Please try again.' : 
                     'Error al guardar el video. Por favor, intenta de nuevo.';
                 alert(errorText);
                 console.error('Error:', error);
-                // Volver a mostrar la pregunta actual para que puedan intentar de nuevo
-                showQuestion();
             }
         }
 
@@ -735,7 +686,7 @@
                 // Enviar a Google Sheets via Apps Script
                 const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Google Apps Script requiere no-cors
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -743,11 +694,10 @@
                         evaluationId: state.evaluationId,
                         questionId: question.id,
                         videoData: base64Data,
-                        videoType: question.type
+                        videoType: question.fields['Type']
                     })
                 });
                 
-                // Con mode: no-cors, no podemos leer la respuesta, pero si llega aquí, se envió
                 console.log('Video enviado a Google Sheets exitosamente');
                 
             } catch (error) {
@@ -763,15 +713,11 @@
                     state.stream.getTracks().forEach(track => track.stop());
                 }
                 
-                // Ya no necesitamos desactivar via API
-                // La automatización puede hacerlo si es necesario
-                
                 document.getElementById('questionContainer').classList.add('hidden');
                 document.getElementById('resultsScreen').classList.remove('hidden');
                 
             } catch (error) {
                 console.error('Error al finalizar evaluación:', error);
-                // Mostrar resultados de todos modos
                 document.getElementById('questionContainer').classList.add('hidden');
                 document.getElementById('resultsScreen').classList.remove('hidden');
             }
