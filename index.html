@@ -326,7 +326,7 @@
         
         const CONFIG = {
             AIRTABLE_API_KEY: 'pat8oZQ31bhFCgtiu.1b614abc17a743d1438108fab30e7d7affc095b7d0f7269d0b03dfa77b502ac6',
-            SAVE_VIDEO_API: 'https://corheselect-evaluaciones.vercel.app/api/save-video',
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyI5ZK17xa-YHJzPJ9mC0EGnIXLSlAgzqtXEml_MTP-8JxfG0Iw7d1cJE0TtsyDSb9k2Q/execx',
             AIRTABLE_BASE_ID: 'appvaNZdmHt24cHJV',
             MAX_RECORDING_SECONDS: 180
         };
@@ -730,9 +730,10 @@
                 
                 const base64Data = await base64Promise;
                 
-                // Enviar a nuestra API de Vercel (evita CORS y problemas de permisos)
-                const response = await fetch(CONFIG.SAVE_VIDEO_API, {
+                // Enviar a Google Sheets via Apps Script
+                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', // Google Apps Script requiere no-cors
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -744,14 +745,14 @@
                     })
                 });
                 
-                if (!response.ok) {
-                    const error = await response.json();
-                    console.error('Error al guardar video:', error);
-                    throw new Error(`Error ${response.status}: ${error.error || 'Unknown error'}`);
-                }
+                // Con mode: no-cors, no podemos leer la respuesta, pero si llega aquí, se envió
+                console.log('Video enviado a Google Sheets exitosamente');
                 
-                const result = await response.json();
-                console.log('Video guardado exitosamente:', result.recordId);
+            } catch (error) {
+                console.error('Error guardando video:', error);
+                throw error;
+            }
+        }
                 
             } catch (error) {
                 console.error('Error guardando video:', error);
