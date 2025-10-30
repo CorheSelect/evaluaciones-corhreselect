@@ -76,12 +76,12 @@
         
         .controls { display: flex; gap: 10px; margin-top: 20px; }
         .control-button { flex: 1; padding: 16px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-        .btn-record { background: #dc2626; color: white; }
-        .btn-record:hover { background: #b91c1c; }
+        .btn-record { background: #10b981; color: white; }
+        .btn-record:hover { background: #059669; }
         .btn-ready { background: #48bb78; color: white; }
         .btn-ready:hover { background: #38a169; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(72,187,120,0.4); }
-        .btn-stop { background: #059669; color: white; }
-        .btn-stop:hover { background: #047857; }
+        .btn-stop { background: #dc2626; color: white; }
+        .btn-stop:hover { background: #b91c1c; }
         .btn-review { background: #3b82f6; color: white; }
         .btn-review:hover { background: #2563eb; }
         .btn-retry { background: #f59e0b; color: white; }
@@ -599,6 +599,12 @@
                 clearInterval(state.recordingInterval);
                 state.recordingInterval = null;
             }
+            
+            // Resetear display del timer
+            const timerDisplay = document.getElementById('recordingTimer');
+            if (timerDisplay) {
+                timerDisplay.textContent = '00:00';
+            }
         }
 
         function showQuestion() {
@@ -677,6 +683,7 @@
 
         function showRecordingPhase() {
             document.getElementById('prepPhase').classList.add('hidden');
+            document.getElementById('reviewPhase').classList.add('hidden');
             document.getElementById('recordingPhase').classList.remove('hidden');
             
             document.getElementById('videoPreview').srcObject = state.stream;
@@ -747,6 +754,7 @@
         }
 
         function showReviewPhase() {
+            document.getElementById('prepPhase').classList.add('hidden');
             document.getElementById('recordingPhase').classList.add('hidden');
             document.getElementById('reviewPhase').classList.remove('hidden');
             
@@ -765,6 +773,18 @@
             // Resetear el blob y chunks para nueva grabación
             state.currentBlob = null;
             state.recordedChunks = [];
+            
+            // Limpiar timer si existe
+            if (state.recordingInterval) {
+                clearInterval(state.recordingInterval);
+                state.recordingInterval = null;
+            }
+            
+            // Resetear display del timer
+            document.getElementById('recordingTimer').textContent = '00:00';
+            
+            // Ocultar fase de review explícitamente
+            document.getElementById('reviewPhase').classList.add('hidden');
             
             // Mostrar fase de grabación
             showRecordingPhase();
