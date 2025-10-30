@@ -755,6 +755,18 @@
         }
 
         function retryRecording() {
+            // Limpiar el video de reproducción
+            const videoPlayback = document.getElementById('videoPlayback');
+            if (videoPlayback) {
+                videoPlayback.src = '';
+                videoPlayback.load();
+            }
+            
+            // Resetear el blob y chunks para nueva grabación
+            state.currentBlob = null;
+            state.recordedChunks = [];
+            
+            // Mostrar fase de grabación
             showRecordingPhase();
         }
 
