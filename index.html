@@ -704,7 +704,7 @@
                 state.currentQuestionIndex++;
                 
                 if (state.currentQuestionIndex < state.questions.length) {
-                    location.reload();
+                    showQuestion(); // Mostrar siguiente pregunta sin recargar
                 } else {
                     finishEvaluation();
                 }
@@ -715,6 +715,8 @@
                     'Error al guardar el video. Por favor, intenta de nuevo.';
                 alert(errorText);
                 console.error('Error:', error);
+                // Volver a mostrar la pregunta actual para que puedan intentar de nuevo
+                showQuestion();
             }
         }
 
