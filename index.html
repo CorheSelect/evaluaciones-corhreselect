@@ -575,7 +575,36 @@
             showQuestion();
         }
 
+        function cleanupVideoState() {
+            // Limpiar videos
+            const videoPreview = document.getElementById('videoPreview');
+            const videoPlayback = document.getElementById('videoPlayback');
+            
+            if (videoPreview) {
+                videoPreview.srcObject = null;
+                videoPreview.src = '';
+            }
+            
+            if (videoPlayback) {
+                videoPlayback.src = '';
+                videoPlayback.load(); // Forzar reset
+            }
+            
+            // Limpiar estado de grabación
+            state.currentBlob = null;
+            state.recordedChunks = [];
+            
+            // Limpiar timers si existen
+            if (state.recordingInterval) {
+                clearInterval(state.recordingInterval);
+                state.recordingInterval = null;
+            }
+        }
+
         function showQuestion() {
+            // Limpiar estado del video anterior
+            cleanupVideoState();
+            
             const question = state.questions[state.currentQuestionIndex];
             
             if (state.currentQuestionIndex === state.softSkillsCount && state.currentSection === 'softskills') {
@@ -758,39 +787,35 @@
         }
 
         async function saveVideoResponse() {
-            try {
-                const question = state.questions[state.currentQuestionIndex];
-                
-                const reader = new FileReader();
-                const base64Promise = new Promise((resolve) => {
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(state.currentBlob);
-                });
-                
-                const base64Data = await base64Promise;
-                
-                // Enviar a Google Sheets via Apps Script
-                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Google Apps Script requiere no-cors
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        evaluationId: state.evaluationId,
-                        questionId: question.id,
-                        videoData: base64Data,
-                        videoType: question.type
-                    })
-                });
-                
-                // Con mode: no-cors, no podemos leer la respuesta, pero si llega aquí, se envió
-                console.log('Video enviado a Google Sheets exitosamente');
-                
-            } catch (error) {
-                console.error('Error guardando video:', error);
-                throw error;
-            }
+            // Con mode: no-cors no podemos detectar errores de respuesta
+            // Si llega aquí sin error de JavaScript, asumimos que se envió correctamente
+            const question = state.questions[state.currentQuestionIndex];
+            
+            const reader = new FileReader();
+            const base64Promise = new Promise((resolve) => {
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(state.currentBlob);
+            });
+            
+            const base64Data = await base64Promise;
+            
+            // Enviar a Google Sheets via Apps Script
+            await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Google Apps Script requiere no-cors
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    evaluationId: state.evaluationId,
+                    questionId: question.id,
+                    videoData: base64Data,
+                    videoType: question.type
+                })
+            });
+            
+            // Con mode: no-cors, no podemos leer la respuesta, pero si llega aquí sin error, se envió
+            console.log('Video enviado a Google Sheets exitosamente');
         }
 
 
