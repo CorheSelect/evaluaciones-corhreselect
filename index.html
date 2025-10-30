@@ -602,9 +602,6 @@
         }
 
         function showQuestion() {
-            // Limpiar estado del video anterior
-            cleanupVideoState();
-            
             const question = state.questions[state.currentQuestionIndex];
             
             if (state.currentQuestionIndex === state.softSkillsCount && state.currentSection === 'softskills') {
@@ -616,12 +613,14 @@
             document.getElementById('progressBar').style.width = progress + '%';
             
             let questionNumberText = '';
-            let languageBadgeHTML = '';
+            let badgeText = '';
+            let badgeClass = 'language-badge';
             
             if (question.type === 'softskills') {
                 const softSkillsNum = state.currentQuestionIndex + 1;
                 questionNumberText = `Pregunta ${softSkillsNum} de ${state.softSkillsCount}`;
-                languageBadgeHTML = '<span class="language-badge">🇪🇸 ESPAÑOL</span>';
+                badgeText = '🇪🇸 ESPAÑOL';
+                badgeClass = 'language-badge';
                 
                 document.getElementById('prepTitle').textContent = 'Tómate tu tiempo para preparar';
                 document.getElementById('prepMessage').textContent = 'Lee la pregunta con atención y prepara mentalmente tu respuesta. Cuando estés listo/a para grabar, haz clic en el botón de abajo.';
@@ -635,7 +634,8 @@
                 const englishNum = state.currentQuestionIndex - state.softSkillsCount + 1;
                 const englishTotal = state.questions.length - state.softSkillsCount;
                 questionNumberText = `Question ${englishNum} of ${englishTotal}`;
-                languageBadgeHTML = '<span class="language-badge english">🇬🇧 ENGLISH</span>';
+                badgeText = '🇬🇧 ENGLISH';
+                badgeClass = 'language-badge english';
                 
                 document.getElementById('prepTitle').textContent = 'Take your time to prepare';
                 document.getElementById('prepMessage').textContent = 'Read the question carefully and prepare your answer mentally. When you\'re ready to record, click the button below.';
@@ -648,7 +648,13 @@
             }
             
             document.getElementById('questionNumber').textContent = questionNumberText;
-            document.getElementById('languageBadge').outerHTML = languageBadgeHTML;
+            
+            // Cambiar badge sin reemplazar el elemento
+            const badge = document.getElementById('languageBadge');
+            if (badge) {
+                badge.className = badgeClass;
+                badge.textContent = badgeText;
+            }
             
             document.getElementById('questionText').textContent = question.text;
             
@@ -761,6 +767,9 @@
                 
                 await saveVideoResponse();
                 
+                // Limpiar estado del video DESPUÉS de guardar exitosamente
+                cleanupVideoState();
+                
                 // Ocultar overlay
                 document.getElementById('loadingOverlay').classList.remove('active');
                 
@@ -781,19 +790,24 @@
                     'Error al guardar el video. Por favor, intenta de nuevo.';
                 alert(errorText);
                 console.error('Error:', error);
-                // Volver a mostrar la pregunta actual para que puedan intentar de nuevo
-                showQuestion();
+                // NO limpiar el estado si hay error - para poder reintentar
             }
         }
 
         async function saveVideoResponse() {
             // Con mode: no-cors no podemos detectar errores de respuesta
             // Si llega aquí sin error de JavaScript, asumimos que se envió correctamente
+            
+            if (!state.currentBlob) {
+                throw new Error('No hay video grabado para guardar');
+            }
+            
             const question = state.questions[state.currentQuestionIndex];
             
             const reader = new FileReader();
-            const base64Promise = new Promise((resolve) => {
+            const base64Promise = new Promise((resolve, reject) => {
                 reader.onloadend = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Error al leer el video'));
                 reader.readAsDataURL(state.currentBlob);
             });
             
